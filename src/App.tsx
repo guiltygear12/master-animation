@@ -1,24 +1,22 @@
 import styled from "styled-components";
-import { animate, motion } from "framer-motion";
-import { useRef, useState } from "react";
+import {
+    animate,
+    motion,
+    useMotionValue,
+    useMotionValueEvent,
+    useScroll,
+    useTransform,
+    useViewportScroll,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
-const Wrapper = styled.div`
-    height: 100vh;
+const Wrapper = styled(motion.div)`
+    height: 200vh;
     width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
-`;
-const BigBox = styled(motion.div)`
-    width: 600px;
-    height: 600px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 36px;
-    background-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
-    /* overflow: hidden; */
+    background: linear-gradient(135deg, #e09, #d0e); ;
 `;
 const Box = styled(motion.div)`
     width: 200px;
@@ -30,31 +28,36 @@ const Box = styled(motion.div)`
     border-radius: 24px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
-const boxStage = {
-    hover: { scale: 1.5, rotateZ: 180 },
-    tap: { scale: 1, borderRadius: "100px" },
-    drag: {
-        backgroundColor: "rgb(46, 504,113)",
-        transition: { duration: 10 },
-    },
-};
+const boxStage = {};
 function App() {
-    const bigBoxRef = useRef<HTMLDivElement>(null);
-    const [trigger, setTrigger] = useState(true);
+    const y = useMotionValue(0);
+    const rotateZ = useTransform(y, [-800, 800], [-360, 360]);
+    const gradient = useTransform(
+        y,
+        [-800, 800],
+        [
+            "linear-gradient(135deg, rgb(0, 210, 238), rgb(0, 83, 238))",
+            "linear-gradient(135deg, rgb(0, 238, 155), rgb(238, 178, 0))",
+        ]
+    );
+    const { scrollY, scrollYProgress } = useScroll();
+    const scale = useTransform(scrollYProgress, [0, 1], [1, 5]);
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        console.log("scrollY : ", latest);
+    });
+    useMotionValueEvent(scrollYProgress, "change", (latest) => {
+        console.log("scrollYProgress : ", latest);
+    });
+    useEffect(() => {}, []);
     return (
-        <Wrapper>
-            <BigBox ref={bigBoxRef}>
-                <Box
-                    drag
-                    dragSnapToOrigin
-                    dragElastic={0}
-                    dragConstraints={bigBoxRef}
-                    variants={boxStage}
-                    whileHover="hover"
-                    whileDrag="drag"
-                    whileTap="tap"
-                ></Box>
-            </BigBox>
+        <Wrapper style={{ background: gradient }}>
+            <Box
+                style={{ y, rotateZ, scale: scrollYProgress }}
+                drag
+                dragSnapToOrigin
+                initial={{ y: 800 }}
+                animate={{ y: 0, transition: { duration: 3, delay: 2 } }}
+            ></Box>
         </Wrapper>
     );
 }
