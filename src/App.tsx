@@ -11,53 +11,51 @@ import {
 import { useEffect, useRef, useState } from "react";
 
 const Wrapper = styled(motion.div)`
-    height: 200vh;
+    height: 100vh;
     width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
     background: linear-gradient(135deg, #e09, #d0e); ;
 `;
-const Box = styled(motion.div)`
-    width: 200px;
-    height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 1);
-    border-radius: 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+const Svg = styled.svg`
+    width: 100px;
+    color: white;
+    path {
+        stroke: white;
+        stroke-width: 4;
+    }
 `;
-const boxStage = {};
+const stageSvg = {
+    start: {
+        pathLength: 0.1,
+        fill: "rgba(255,255,255,0)",
+        opacity: 1,
+    },
+    end: {
+        pathLength: 1,
+        fill: "rgba(255,255,255,1)",
+        opacity: 1,
+    },
+};
 function App() {
-    const y = useMotionValue(0);
-    const rotateZ = useTransform(y, [-800, 800], [-360, 360]);
-    const gradient = useTransform(
-        y,
-        [-800, 800],
-        [
-            "linear-gradient(135deg, rgb(0, 210, 238), rgb(0, 83, 238))",
-            "linear-gradient(135deg, rgb(0, 238, 155), rgb(238, 178, 0))",
-        ]
-    );
-    const { scrollY, scrollYProgress } = useScroll();
-    const scale = useTransform(scrollYProgress, [0, 1], [1, 5]);
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        console.log("scrollY : ", latest);
-    });
-    useMotionValueEvent(scrollYProgress, "change", (latest) => {
-        console.log("scrollYProgress : ", latest);
-    });
-    useEffect(() => {}, []);
     return (
-        <Wrapper style={{ background: gradient }}>
-            <Box
-                style={{ y, rotateZ, scale: scrollYProgress }}
-                drag
-                dragSnapToOrigin
-                initial={{ y: 800 }}
-                animate={{ y: 0, transition: { duration: 3, delay: 2 } }}
-            ></Box>
+        <Wrapper>
+            <Svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <motion.path
+                    variants={stageSvg}
+                    initial="start"
+                    animate="end"
+                    fill="transparent"
+                    transition={{
+                        default: {
+                            duration: 3,
+                        },
+                        fill: { duration: 2, delay: 1 },
+                    }}
+                    d="M391.17,103.47H352.54v109.7h38.63ZM285,103H246.37V212.75H285ZM120.83,0,24.31,91.42V420.58H140.14V512l96.53-91.42h77.25L487.69,256V0ZM449.07,237.75l-77.22,73.12H294.61l-67.6,64v-64H140.14V36.58H449.07Z"
+                />
+            </Svg>
         </Wrapper>
     );
 }
